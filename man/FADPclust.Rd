@@ -4,8 +4,8 @@
 \alias{FADPclust}
 \title{Functional Data Clustering Using Adaptive Density Peak Detection}
 \usage{
-FADPclust(fdata, cluster = 2:10, method = "FADP1",
-  proportion = seq(0.1, 1, 0.1), f.cut = 0.15, pve = 0.99)
+FADPclust(fdata, cluster = 2:10, method = "FADP1", proportion = NULL,
+  f.cut = 0.15, pve = 0.9, stats = "silhouette")
 }
 \arguments{
 \item{fdata}{for univariate functional data clustering: a functional data object produced by fd() function of fda package; for multivariate functional data clustering: a list of functional data objects produced by fd() function of fda package.}
@@ -18,7 +18,9 @@ FADPclust(fdata, cluster = 2:10, method = "FADP1",
 
 \item{f.cut}{numeric, a number within the range [0,1], specified to automatically select cluster centroids from the decision plot. The default is 0.15.}
 
-\item{pve}{numeric, a number within the range [0,1], the proportion of variance explained: used to choose the number of functional principal components. The default is 0.99. When the method is chosen to be 'FADP1', there is no need to specify parameter 'pve' for univariate functional data clustering.}
+\item{pve}{numeric, a number within the range [0,1], the proportion of variance explained: used to choose the number of functional principal components. The default is 0.9. When the method is chosen to be 'FADP1', there is no need to specify parameter 'pve' for univariate functional data clustering.}
+
+\item{stats}{character string specifying the distance based statistics for cluster validation and determining the number of clusters. Valid options are 'silhouette', 'Dunn', and 'CH' (See the description document of the cluster.stats function in the fpc R package for more details about these statistics). The default is "silhouette".}
 }
 \value{
 An 'FADPclust' object that contains the list of the following items.
@@ -45,21 +47,26 @@ The smoothing parameter k in functional k-nearest neighbor density estimation mu
 ###univariate functional data
 data("simData1")
 plot(simData1, xlab = "x", ylab = "y")
-FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP1",
-                       proportion = seq(0.02, 0.2, 0.02))
-FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP2",
-                     proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       stats = "silhouette")
 FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+\donttest{
+FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP2",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 
-\donttest{
 ###multivariate functional data
 data("simData2")
-FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP1",
-                       proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
-FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP2",
-                     proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP1",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+
+FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP2",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 }
 }
@@ -68,7 +75,7 @@ FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 \item Lauter, H. (1988), "Silverman, B. W.: "Density Estimation for Statistics and Data Analysis.," Biometrical Journal, 30(7), 876-877.
 \item Wang, X. F., and Xu, Y. (2016), "Fast Clustering Using Adaptive Density Peak Detection," Statistical Methods in Medical Research.
 \item Rodriguez, A., and Laio, A. (2014), "Machine learning. Clustering by fast search and find of density peaks," Science, 344(6191), 1492.
-\item Yaohui, L., Zhengming, M., and Fang, Y. (2017), "Adaptive density peak clustering based on K-nearest neighbors with aggregating strategy," Knowledge-Based Systems, 133(oct.1), 208-220.
+\item Liu Y, Ma Z, and Yu F. (2017), "Adaptive density peak clustering based on K-nearest neighbors with aggregating strategy," Knowledge-Based Systems, 133(oct.1), 208-220.
 }
 }
 \seealso{

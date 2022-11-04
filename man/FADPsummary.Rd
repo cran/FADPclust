@@ -16,21 +16,26 @@ Summarize the result obetained from the FADPclust() function.
 ###univariate functional data
 data("simData1")
 plot(simData1, xlab = "x", ylab = "y")
-FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP1",
-                       proportion = seq(0.02, 0.2, 0.02))
-FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP2",
-                     proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       stats = "silhouette")
 FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+\donttest{
+FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP2",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 
-\donttest{
 ###multivariate functional data
 data("simData2")
-FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP1",
-                       proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
-FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP2",
-                     proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP1",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+
+FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP2",
+                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                       pve = 0.9, stats = "silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 }
 }

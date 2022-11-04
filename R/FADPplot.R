@@ -13,21 +13,26 @@
 ##' ###univariate functional data
 ##' data("simData1")
 ##' plot(simData1, xlab = "x", ylab = "y")
-##' FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP1",
-##'                        proportion = seq(0.02, 0.2, 0.02))
-##' FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:10, method = "FADP2",
-##'                      proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+##' FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                        stats = "silhouette")
 ##' FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+##' \donttest{
+##' FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP2",
+##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                        pve = 0.9, stats = "silhouette")
 ##' FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 ##'
-##' \donttest{
 ##' ###multivariate functional data
 ##' data("simData2")
-##' FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP1",
-##'                        proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
-##' FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:10, method = "FADP2",
-##'                      proportion = seq(0.02, 0.2, 0.02), pve = 0.9)
+##' FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP1",
+##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                        pve = 0.9, stats = "silhouette")
 ##' FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+##'
+##' FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP2",
+##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                        pve = 0.9, stats = "silhouette")
 ##' FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 ##' }
 
@@ -36,7 +41,7 @@ FADPplot <- function(object, cols = "default") {
   nclusters <- sils <- NULL  # Null out to remove 'no visible binding for global variable' note from R check.
   defCol    <- function() {
     mycols  <- c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33",
-                "#A65628", "#F781BF", "#999999", "blue")
+                 "#A65628", "#F781BF", "#999999", "blue")
     return(mycols)
   }
   if (cols == "default")
