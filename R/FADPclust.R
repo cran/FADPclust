@@ -6,7 +6,7 @@
 ##' @param proportion numeric, a number or numeric vector of numbers within the range [0,1], specifying to automatically select the smoothing parameter k in density estimation (see details). The default is 0.1, 0.2, ... ,1.
 ##' @param f.cut numeric, a number within the range [0,1], specified to automatically select cluster centroids from the decision plot. The default is 0.15.
 ##' @param pve numeric, a number within the range [0,1], the proportion of variance explained: used to choose the number of functional principal components. The default is 0.9. When the method is chosen to be 'FADP1', there is no need to specify parameter 'pve' for univariate functional data clustering.
-##' @param stats character string specifying the distance based statistics for cluster validation and determining the number of clusters. Valid options are 'silhouette', 'Dunn', and 'CH' (See the description document of the cluster.stats function in the fpc R package for more details about these statistics). The default is "silhouette".
+##' @param stats character string specifying the distance based statistics for cluster validation and determining the number of clusters. Valid options are 'Avg.silhouette', 'Dunn', and 'CH' (See the description document of the cluster.stats function in the fpc R package for more details about these statistics). The default is "Avg.silhouette".
 ##' @details Given n functional objects or curves, FADPclust() calculates f(x) and delta(x) for each object based on the semi-metric distance (see details in references), where f(x) is the local density calculated by the functional k-nearest neighbor density estimator of curve x, and delta(x) is the shortest semi-metric distance between sample curve x and y for all samples y such that f(x) <= f(y). Functional objects or curves with large f and large delta values are labeled class centroids. In other words, they appear as isolated points in the upper right corner of the f vs delta plot (the decision plot, see details in FADPplot). After cluster centroids are determined, other obejects are clustered according to their semi-metric distances to the closes centroids.
 ##'
 ##' The smoothing parameter k in functional k-nearest neighbor density estimation must be explicitly provided. Following Lauter (1988)'s idea, suggest that the optimal size of k satisfies a certain proportion, k = a*n^(4/5), where a is a parameter about the optimal proportion to be determined. Here, users enters variable 'proportion' to specify the parameter a.
@@ -19,7 +19,9 @@
 ##' \item{density:}{ final density vector f(x). }
 ##' \item{delta:}{ final delta vector delta(x). }
 ##' \item{center:}{ indices of the clustering centers. }
-##' \item{silhouette:}{ silhouette score from the final clustering result. }
+##' \item{Avg.silhouette:}{ average silhouette score from the final clustering result. }
+##' \item{Dunn:}{ Dunn statistics from the final clustering result. }
+##' \item{CH:}{ CH statistics from the final clustering result. }
 ##' }
 ##' @references
 ##' \itemize{
@@ -33,26 +35,36 @@
 ##' ###univariate functional data
 ##' data("simData1")
 ##' plot(simData1, xlab = "x", ylab = "y")
-##' FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
-##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-##'                        stats = "silhouette")
-##' FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+##' FADP1.sil.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+##'                            proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                            stats = "Avg.silhouette")
+##' FADPsummary(FADP1.sil.ans); FADPplot(FADP1.sil.ans)
 ##' \donttest{
+##' FADP1.dunn.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+##'                             proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                             stats = "Dunn")
+##' FADPsummary(FADP1.dunn.ans); FADPplot(FADP1.dunn.ans)
+##'
+##' FADP1.ch.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+##'                           proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+##'                           stats = "CH")
+##' FADPsummary(FADP1.ch.ans); FADPplot(FADP1.ch.ans)
+##'
 ##' FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP2",
 ##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-##'                        pve = 0.9, stats = "silhouette")
+##'                        pve = 0.9, stats = "Avg.silhouette")
 ##' FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 ##'
 ##' ###multivariate functional data
 ##' data("simData2")
 ##' FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP1",
 ##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-##'                        pve = 0.9, stats = "silhouette")
+##'                        pve = 0.9, stats = "Avg.silhouette")
 ##' FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
 ##'
 ##' FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP2",
 ##'                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-##'                        pve = 0.9, stats = "silhouette")
+##'                        pve = 0.9, stats = "Avg.silhouette")
 ##' FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 ##' }
 ##' @import fda
@@ -67,7 +79,7 @@
 
 FADPclust <- function(fdata, cluster = 2:10, method = "FADP1",
                       proportion = NULL, f.cut = 0.15,
-                      pve = 0.90, stats = "silhouette"){
+                      pve = 0.90, stats = "Avg.silhouette"){
   if( !inherits(fdata, "fd") & !inherits(fdata, "list") ){
     stop( "Error in fdata! For univariate FADP: fdata should be a functional data object produced by fd() function of fda package, for multivariate FADP: a list of functional data objects.", sep="\n" )
   }
@@ -155,7 +167,7 @@ FADPclust <- function(fdata, cluster = 2:10, method = "FADP1",
       center.temp            <- which(del %in% sort(del[den.index], decreasing = T)[1:m])
       result.temp            <- assignment(center = center.temp, distance = distance, den = den)
       stats.temp             <- cluster.stats(d = distance, clustering = result.temp)
-      if(stats == "silhouette"){ evaluation <- stats.temp$avg.silwidth }
+      if(stats == "Avg.silhouette"){ evaluation <- stats.temp$avg.silwidth }
       if(stats == "Dunn"){ evaluation <- stats.temp$dunn2 }
       if(stats == "CH"){ evaluation <- stats.temp$ch }
       return(list(evaluation = evaluation, clustering = result.temp, density = den, delta = del, center = center.temp))
@@ -176,7 +188,7 @@ FADPclust <- function(fdata, cluster = 2:10, method = "FADP1",
                            method, clustering.selected, density.selected, delta.selected, center.selected, max(evaluation.list))
     #result         <- list(nclust.selected, round(k.selected),
     #                       method, clustering.selected, density.selected, delta.selected, center.selected, max(evaluation.list))
-    names(result)  <- c("nclust", "para","method", "clust", "density", "delta", "center", "stats")
+    names(result)  <- c("nclust", "para","method", "clust", "density", "delta", "center", stats)
     return(result)
   }
 
@@ -200,7 +212,7 @@ FADPclust <- function(fdata, cluster = 2:10, method = "FADP1",
       center.temp            <- which(del %in% sort(del[den.index], decreasing = T)[1:m])
       result.temp            <- assignment(center = center.temp, distance = distance, den = den)
       stats.temp             <- cluster.stats(d = distance, clustering = result.temp)
-      if(stats == "silhouette"){ evaluation <- stats.temp$avg.silwidth }
+      if(stats == "Avg.silhouette"){ evaluation <- stats.temp$avg.silwidth }
       if(stats == "Dunn"){ evaluation <- stats.temp$dunn2 }
       if(stats == "CH"){ evaluation <- stats.temp$ch }
       return(list(evaluation = evaluation, clustering = result.temp, density = den, delta = del, center = center.temp))
@@ -225,7 +237,7 @@ FADPclust <- function(fdata, cluster = 2:10, method = "FADP1",
                            method, clustering.selected, density.selected, delta.selected, center.selected, max(evaluation.list))
     #result         <- list(nclust.selected, h.opt,
     #                       method, clustering.selected, density.selected, delta.selected, center.selected, max(evaluation.list))
-    names(result)  <- c("nclust", "para","method", "clust", "density", "delta", "center", "stats")
+    names(result)  <- c("nclust", "para","method", "clust", "density", "delta", "center", stats)
     return(result)
   }
 

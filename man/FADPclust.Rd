@@ -5,7 +5,7 @@
 \title{Functional Data Clustering Using Adaptive Density Peak Detection}
 \usage{
 FADPclust(fdata, cluster = 2:10, method = "FADP1", proportion = NULL,
-  f.cut = 0.15, pve = 0.9, stats = "silhouette")
+  f.cut = 0.15, pve = 0.9, stats = "Avg.silhouette")
 }
 \arguments{
 \item{fdata}{for univariate functional data clustering: a functional data object produced by fd() function of fda package; for multivariate functional data clustering: a list of functional data objects produced by fd() function of fda package.}
@@ -20,7 +20,7 @@ FADPclust(fdata, cluster = 2:10, method = "FADP1", proportion = NULL,
 
 \item{pve}{numeric, a number within the range [0,1], the proportion of variance explained: used to choose the number of functional principal components. The default is 0.9. When the method is chosen to be 'FADP1', there is no need to specify parameter 'pve' for univariate functional data clustering.}
 
-\item{stats}{character string specifying the distance based statistics for cluster validation and determining the number of clusters. Valid options are 'silhouette', 'Dunn', and 'CH' (See the description document of the cluster.stats function in the fpc R package for more details about these statistics). The default is "silhouette".}
+\item{stats}{character string specifying the distance based statistics for cluster validation and determining the number of clusters. Valid options are 'Avg.silhouette', 'Dunn', and 'CH' (See the description document of the cluster.stats function in the fpc R package for more details about these statistics). The default is "Avg.silhouette".}
 }
 \value{
 An 'FADPclust' object that contains the list of the following items.
@@ -32,7 +32,9 @@ An 'FADPclust' object that contains the list of the following items.
 \item{density:}{ final density vector f(x). }
 \item{delta:}{ final delta vector delta(x). }
 \item{center:}{ indices of the clustering centers. }
-\item{silhouette:}{ silhouette score from the final clustering result. }
+\item{Avg.silhouette:}{ average silhouette score from the final clustering result. }
+\item{Dunn:}{ Dunn statistics from the final clustering result. }
+\item{CH:}{ CH statistics from the final clustering result. }
 }
 }
 \description{
@@ -47,26 +49,36 @@ The smoothing parameter k in functional k-nearest neighbor density estimation mu
 ###univariate functional data
 data("simData1")
 plot(simData1, xlab = "x", ylab = "y")
-FADP1.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
-                       proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-                       stats = "silhouette")
-FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
+FADP1.sil.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+                           proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                           stats = "Avg.silhouette")
+FADPsummary(FADP1.sil.ans); FADPplot(FADP1.sil.ans)
 \donttest{
+FADP1.dunn.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+                            proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                            stats = "Dunn")
+FADPsummary(FADP1.dunn.ans); FADPplot(FADP1.dunn.ans)
+
+FADP1.ch.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP1",
+                          proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
+                          stats = "CH")
+FADPsummary(FADP1.ch.ans); FADPplot(FADP1.ch.ans)
+
 FADP2.ans <- FADPclust(fdata = simData1, cluster = 2:5, method = "FADP2",
                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-                       pve = 0.9, stats = "silhouette")
+                       pve = 0.9, stats = "Avg.silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 
 ###multivariate functional data
 data("simData2")
 FADP1.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP1",
                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-                       pve = 0.9, stats = "silhouette")
+                       pve = 0.9, stats = "Avg.silhouette")
 FADPsummary(FADP1.ans); FADPplot(FADP1.ans)
 
 FADP2.ans <- FADPclust(fdata = simData2, cluster = 2:5, method = "FADP2",
                        proportion = seq(0.02, 0.2, 0.02), f.cut = 0.15,
-                       pve = 0.9, stats = "silhouette")
+                       pve = 0.9, stats = "Avg.silhouette")
 FADPsummary(FADP2.ans); FADPplot(FADP2.ans)
 }
 }
